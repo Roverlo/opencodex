@@ -180,3 +180,14 @@ Two things still worth raising, neither blocking:
    metadata", which is the same conflation the runtime guard just refused.
 
 No close. The PR stays theirs.
+
+## Executed
+
+Comment `5203708625`. Credits the sub-30-minute turnaround explicitly (review
+09:09:51Z → commits 09:38:19Z), quotes the restored guard including the comment
+keeping `unknown` distinct in debug, and notes the GUI notice copy was theirs
+rather than ours. Two asks, neither blocking: split the unrelated `imageInput`
+scope, and double-check that a *known but empty* ladder still constrains the
+intersection.
+
+PR remains OPEN. Nothing absorbed, nothing closed.

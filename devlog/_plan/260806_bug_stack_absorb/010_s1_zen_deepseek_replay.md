@@ -167,3 +167,32 @@ If assertion 3 does not go red under that edit it is vacuous and must not ship.
    author is better placed to run it against their own Zen access than we are.
 
 No close. The PR stays theirs.
+
+## Executed — and the PR merged mid-phase
+
+Posted comment `5203704926` at 10:53Z naming the failing test with the reproduced
+`routeModel` output. **#1068 had merged at 10:45:57Z** (by Wibias), eight minutes
+earlier, and the merged code is not what I reviewed:
+
+```ts
+noVisionModels: [...OPENCODE_ZEN_TEXT_ONLY_MODELS, ...DEEPSEEK_THINKING_MODELS],
+```
+
+That is the union the review asked for. Running the merged suite against
+`origin/dev` gives **9 pass / 0 fail**, including the three-id case and a new
+"Zen text-only free models (measured #1043) stay in noVisionModels" test pinning
+the original list. Both of my objections were resolved before merge.
+
+Posted correction `5203721089` saying so plainly. The failure mode is worth
+naming because it is cheap to avoid: I fetched a head, wrote a finding against
+it, and posted after the PR had moved. **Re-fetch immediately before commenting**
+— the same class of error as using `updatedAt` earlier in this unit.
+
+Residual carried forward, not a defect: whether `deepseek-v4-pro` and
+`deepseek-v4-flash` genuinely reject images through Zen is still unmeasured. They
+are now guarded on the safe assumption, which is the right default — a stripped
+image degrades to a caption, an unguarded one 400s the whole request.
+
+#994 updated with the dev-only landing (merge `7d0c02dbe`, ancestor of
+`origin/dev`) and deliberately left OPEN pending the reporter's provider
+confirmation and a release.
