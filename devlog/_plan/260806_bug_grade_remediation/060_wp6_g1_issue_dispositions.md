@@ -46,3 +46,23 @@ small number of comments that carry genuinely new information.
 - Every one of the 11 issues has a disposition and a stated unblocking condition.
 - Each comment posted in this phase says something not already on the issue.
 - No issue is closed in this phase.
+
+## Executed (live state verified per issue)
+
+Four comments posted, seven deliberately not. The restraint is the finding: most
+of these already carry an accurate current comment, and re-stating it would have
+added noise to a reporter's inbox while buying nothing.
+
+| Issue | Action | Why |
+|---|---|---|
+| #1100 | comment 5202766906 | NEW: the `modelSupportsReasoningSummaries: true` workaround, verified against the reporter's own provider shape (`GLM/glm-5.2 summaries=true` vs `GLMplain/glm-5.2 summaries=false`, generated locally, no network). Also states what the user asserts by setting it, and what we deliberately did not change |
+| #1024 | comment 5202780631 | NEW: per-model answer to a follow-up that had gone unanswered since 08-04. Splits the four probes into fixed / deliberately-excluded / still-blocked, and surfaces a genuine disagreement — `mimo-v2.5-free` accepts images per the 08-05 probe, so "200 but blind" is a different defect from "rejects images" |
+| #1017 | comment 5202769373 | NEW: cross-link to #1036 plus the specific hazard blocking it, so the issue does not read as abandoned |
+| #994 | comment 5202771720 | NEW: cross-link to #1068, plus the one question that separates this from a lookalike — the report says "OpenCode models" without a model id, and the same 400 text has other causes |
+| #1102 | none | RCA comment posted 08-06; the loopback-peer exemption is a maintainer policy call. Nothing new to add |
+| #904 #796 #418 | none | each already carries an accurate maintainer comment naming the exact missing capture; re-asking is noise |
+| #1059 | none | status comment current as of 08-06 |
+| #241 #417 #92 | none | upstream trackers, each already labelled and cross-referenced |
+
+No issue closed. `#1024` in particular stays open on its `TR` half even though
+the Zen half shipped — a partly-fixed issue is not a closed one.
