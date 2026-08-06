@@ -14,10 +14,33 @@ Two problems to record honestly:
 1. The preflight is skipped on Windows, and a test asserts that skip. Windows is
    where npm cache ownership problems are most common, so the PR does not cover
    its own motivating case on the platform that needs it most.
-2. The description claims "7000 pass / 0 fail". The recorded Windows run has two
-   failing update-job tests, both unexpectedly reaching `spawnStart` under the
-   altered restart flow. The Ubuntu failure is a Bun 1.3.14 segfault after the
-   suite and is not attributable to this patch; macOS was cancelled.
+2. The description claims the full suite passes. It does not.
+
+### Measured at wp4 (run 30748759350, job 91498912876)
+
+```
+ 2 fail
+Ran 7008 tests across 482 files. [853.00s]
+
+(fail) GUI update execution decisions > persists installer-derived job fields
+       without raw cache paths or uid values
+(fail) GUI update execution decisions > sanitizer redacts space-containing
+       profile paths (Wibias reproduction)
+
+175 |       spawnStart: () => { throw new Error("must not spawn"); },
+error: must not spawn
+    at spawnStart (tests\update-job.test.ts:175:37)
+```
+
+Both failures share one cause: the preflight's restart-flow change reaches
+`spawnStart` on a path whose test asserts nothing may restart the proxy. Whether
+the test's expectation or the new flow is correct is the open question — it is
+not re-runnable noise.
+
+Correction to an earlier draft of this doc: **all three legs are red**
+(`ubuntu fail`, `windows fail`, `macos fail`), not "ubuntu segfault, macOS
+cancelled". The comment must not attribute the other two legs to an unrelated
+cause without triaging them, so it asks for separate triage instead.
 
 Because this touches dependency installation and update recovery, `MAINTAINERS.md`
 requires a second-maintainer security review. Being the author does not exempt it —
