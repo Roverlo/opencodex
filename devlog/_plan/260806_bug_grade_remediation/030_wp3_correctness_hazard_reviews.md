@@ -50,6 +50,21 @@ Required change: rebase onto dev, keep the full text-only list and add the
 DeepSeek replay metadata alongside it, and use `deepseekThinkingEffortsFor` /
 `deepseekReasoningMapFor`.
 
+### Measured at wp3 (set arithmetic on the real constants)
+
+```
+dev list:  big-pickle, nemotron-3-ultra-free, ling-3.0-flash-free,
+           north-mini-code-free, laguna-s-2.1-free, deepseek-v4-flash-free
+PR list:   deepseek-v4-pro, deepseek-v4-flash, deepseek-v4-flash-free
+lost:      big-pickle, nemotron-3-ultra-free, ling-3.0-flash-free,
+           north-mini-code-free, laguna-s-2.1-free
+```
+
+Five models, not "some". `deepseek-v4-flash-free` sits in both sets, which is
+almost certainly why the replacement looked safe to the author — worth saying in
+the review so the correction reads as a shared observation rather than a scolding.
+The fix is a union, not a rewrite.
+
 **Correction, from the plan audit.** An earlier draft of this doc told the review
 to call #1068's failing `enforce-target` check substantive. That is wrong and must
 not be written to the author. The current run fails inside the gate script itself
@@ -86,3 +101,14 @@ and the minimal change that keeps the fix.
 - Both comment URLs captured.
 - The #1068 comment names the protected models explicitly.
 - The #1036 comment references the existing review rather than duplicating it.
+
+## Executed
+
+- #1036 → comment 5202680370 (3597 chars). Reproduction given as an MCP server
+  exposing `edit_file`, with both outcomes spelled out; asks for a request-scoped
+  synthetic flag plus the pass-through regression test.
+- #1068 → comment 5202684051 (3107 chars). Carries the set diff above and a
+  one-line union fix; explicitly retracts the earlier "substantive CI failure"
+  framing to the author.
+- `gh pr view` confirms both OPEN after posting. Neither merged, closed, or
+  relabelled.
