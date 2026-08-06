@@ -7,15 +7,29 @@ exactly what stands between their branch and review.
 **No merge happens in this phase.** Merging is a maintainer decision and is
 explicitly out of scope for this loop; wp5 ends by escalating the merge call.
 
-## Verdicts
+## Verdicts (corrected at wp5 P against live state)
 
-| PR | Verdict | Remaining blocker |
-|---|---|---|
-| #1095 | merge-ready | none technical; needs the maintainer's merge decision. Removes forced non-streaming for `deepseek-v4-flash` and synthesizes a terminal only after a structurally complete item lifecycle; real upstream terminals stay authoritative |
-| #1085 | merge-ready pending security review | replaces an unset env reference with a non-secret loopback placeholder; credential-adjacent, so the stated security review is the gate |
-| #1111 | split required | Copilot normalization is sound and its test drives `handleResponses` end to end; the 64 MiB native-history bound is an unrelated fix and belongs in its own PR. Author also states the full suite was interrupted |
-| #1056 | split required | opt-in native-alias workaround for #241, bounded to supported native ids with an honest display label; remove the unrelated `tests/native-profile-drain-server.test.ts` timing edit |
-| #1047 | rebase + full suite | syncs vision replacements into `_rawBody`, which passthrough actually serializes; only lightweight checks have run on the current draft head |
+The roadmap called #1095 and #1085 "merge-ready". Live `gh` state contradicts
+that for #1095, and the correction matters because "merge-ready" is the phrase
+that would have prompted a merge.
+
+| PR | Draft | Behind dev | Verdict | Remaining blocker |
+|---|---|---|---|---|
+| #1095 | **yes** | 341 | code-ready, NOT merge-ready | the fix is sound — removes forced non-streaming for `deepseek-v4-flash`, synthesizes a terminal only after a structurally complete item lifecycle, leaves real upstream terminals authoritative — but it is still a draft and 341 commits behind |
+| #1085 | no | 85 | closest to mergeable | ready for review, but 85 behind and the credential-adjacent security review is still the gate |
+| #1111 | yes | 0 | split required | Copilot normalization is sound and its test drives `handleResponses` end to end; the 64 MiB native-history bound is unrelated and belongs in its own PR. Author states the full suite was interrupted. On the latest dev commit, which is unusual and good |
+| #1056 | yes | 44 | split required | opt-in native-alias workaround for #241, bounded to supported native ids with an honest display label; remove the unrelated `tests/native-profile-drain-server.test.ts` timing edit |
+| #1047 | yes | 341 | rebase + full suite | syncs vision replacements into `_rawBody`, which passthrough actually serializes; only lightweight checks have run on this draft head |
+
+Four of the five are drafts. The repository's readiness gate keeps a draft in
+draft until its author ticks the four-box checklist, and the gate verifies two of
+those claims itself — green `ci`, and the branch at most 10 commits behind dev.
+At 341, 85 and 44 behind, three of these would fail that check today.
+
+So the honest disposition for every one of them is "here is your single
+remaining blocker", not "waiting on a maintainer". That leaves exactly zero PRs
+where the maintainer is the bottleneck — a more useful thing to report than a
+merge queue that does not exist.
 
 ## Note on #1056 and #999
 
@@ -25,11 +39,12 @@ documents the Desktop allowlist limitation. Neither supersedes the other, and
 
 ## Deliverable
 
-Five posted comments, then an escalation to the maintainer naming the two PRs
-that are merge-ready and the decision required.
+Five posted comments, each naming the one blocker that PR owns. No merge-decision
+escalation, because the corrected state shows none is pending.
 
 ## Accept criteria
 
 - Five comment URLs captured.
 - `gh pr view` confirms all five remain open and unmerged after this phase.
-- The escalation states plainly that the agent did not merge.
+- The draft/behind numbers match live `gh` output at posting time, not the
+  roadmap's assumption.
