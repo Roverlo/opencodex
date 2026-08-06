@@ -2387,6 +2387,86 @@ describe("Codex catalog routed normalization", () => {
     expect(routed?.supports_reasoning_summaries).toBe(true);
   });
 
+  // #1100: a routed row can advertise a full effort ladder while
+  // `supports_reasoning_summaries` is false, and Codex gates construction of the
+  // whole Responses `reasoning` object on that flag — so the Desktop picker shows
+  // an effort the wire never carries. The three tests below pin the contract that
+  // keeps the documented escape hatch working.
+  test("routed strip does not defeat an explicit reasoning-summary opt-in (#1100)", async () => {
+    const models = await gatherRoutedModels({
+      providers: {
+        ladder: {
+          adapter: "openai-responses",
+          baseUrl: "https://ladder.example.test/v1",
+          authMode: "key",
+          liveModels: false,
+          models: ["effort-model"],
+          modelReasoningEfforts: { "effort-model": ["low", "high", "max"] },
+          modelSupportsReasoningSummaries: { "effort-model": true },
+        },
+      },
+    });
+    // MUST pass a template: buildCatalogEntries(null, ...) takes the fallback
+    // branch (src/codex/catalog/sync.ts:291-310), which never runs the routed
+    // strip, so a null-template assertion cannot detect a reordering regression.
+    const entries = buildCatalogEntries(nativeTemplate(), [], models);
+    const routed = entries.find(e => e.slug === "ladder/effort-model");
+
+    expect((routed?.supported_reasoning_levels as { effort: string }[]).map(l => l.effort))
+      .toEqual(expect.arrayContaining(["low", "high", "max"]));
+    // The opt-in survives normalizeRoutedCatalogEntry's delete only because
+    // applyCatalogModelMetadata runs after it (src/codex/catalog/sync.ts:266-269).
+    // Swap that order and every opted-in routed provider silently stops getting
+    // reasoning.effort from Codex.
+    expect(routed?.supports_reasoning_summaries).toBe(true);
+  });
+
+  test("routed rows without an opt-in stay conservative about summaries (#1100)", async () => {
+    const models = await gatherRoutedModels({
+      providers: {
+        plain: {
+          adapter: "openai-responses",
+          baseUrl: "https://plain.example.test/v1",
+          authMode: "key",
+          liveModels: false,
+          models: ["effort-model"],
+          modelReasoningEfforts: { "effort-model": ["low", "high", "max"] },
+        },
+      },
+    });
+    const entries = buildCatalogEntries(nativeTemplate(), [], models);
+    const routed = entries.find(e => e.slug === "plain/effort-model");
+
+    // Deliberate, and the direct cause of #1100 for an unconfigured provider: we
+    // do not claim OpenAI-only summary delivery for an arbitrary endpoint just
+    // because it has an effort ladder. The supported remedy is the per-model
+    // opt-in asserted above. Pinned so that flipping this default is ever a
+    // deliberate decision rather than an accident.
+    expect(routed?.supports_reasoning_summaries).toBe(false);
+  });
+
+  test("the no-template fallback never applies the routed summary strip (#1100)", async () => {
+    const models = await gatherRoutedModels({
+      providers: {
+        ladder: {
+          adapter: "openai-responses",
+          baseUrl: "https://ladder.example.test/v1",
+          authMode: "key",
+          liveModels: false,
+          models: ["effort-model"],
+          modelReasoningEfforts: { "effort-model": ["low", "high", "max"] },
+          modelSupportsReasoningSummaries: { "effort-model": true },
+        },
+      },
+    });
+    // Pins the asymmetry itself: the fallback path skips
+    // normalizeRoutedCatalogEntry entirely, so this row is opt-in-true for a
+    // different reason than the template row above. Kept explicit so a future
+    // unification of the two construction paths is a visible change.
+    const routed = buildCatalogEntries(null, [], models).find(e => e.slug === "ladder/effort-model");
+    expect(routed?.supports_reasoning_summaries).toBe(true);
+  });
+
   test("generated jawcode snapshot is restricted to mapped providers", () => {
     expect(resolveJawcodeProvider("kimi")).toBe("moonshot");
     expect(resolveJawcodeProvider("nanogpt")).toBeUndefined();

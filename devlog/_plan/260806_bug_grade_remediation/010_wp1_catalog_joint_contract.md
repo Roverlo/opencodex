@@ -162,6 +162,26 @@ contract. Restore, and all three pass. Record both outputs verbatim.
 If the opt-in test does NOT go red under this edit, the test is vacuous and must
 not be committed.
 
+### Executed result
+
+Run on the landed tests, `bun test tests/codex-catalog.test.ts -t "1100"`:
+
+```
+=== ABLATION APPLIED: strip moved after metadata restore ===
+error: expect(received).toBe(expected)
+Expected: true
+Received: false
+(fail) routed strip does not defeat an explicit reasoning-summary opt-in (#1100)
+(pass) routed rows without an opt-in stay conservative about summaries (#1100)
+(pass) the no-template fallback never applies the routed summary strip (#1100)
+ 2 pass, 1 fail
+```
+
+Exactly the predicted shape: only the template opt-in test goes red, and the
+fallback test stays green in the same run — which is what proves the template
+test is the one carrying the contract. After `git checkout -- src/codex/catalog/sync.ts`
+the `src/` diff is empty and the file is back to 122 pass / 0 fail.
+
 ## Verification
 
 - `bun test tests/codex-catalog.test.ts` — 119 baseline + 3 new, 0 fail.
