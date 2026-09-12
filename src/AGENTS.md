@@ -21,8 +21,4 @@ This file applies to `src/` and inherits the repository-wide rules in `/AGENTS.m
 
 ## Tests and validation
 
-- Place focused regression coverage near the existing tests for the affected subsystem.
-- For focused behavior, run the relevant `bun test tests/<name>.test.ts` and `bun run typecheck`.
-- For shared routing, adapters, config, OAuth, or server behavior, also run `bun run test`.
-- For logging, requests, credentials, account data, or fixtures, also run `bun run privacy:scan`.
-- Update `docs-site/` when the change affects user-visible behavior or configuration.
+Follow the shared [validation policy](../docs/VALIDATION.md). Focused behavior changes need a nearby regression test and typecheck; shared runtime/security changes require the full suite. Do not treat historical or environment-specific failures as permanent exemptions. Update docs-site/ for user-visible behavior or configuration changes.
